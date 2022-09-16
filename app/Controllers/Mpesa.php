@@ -11,7 +11,6 @@ class Mpesa extends BaseController
     {
         $this->base_url = "https://0d26-102-135-169-122.eu.ngrok.io";
         $this->client = \Config\Services::curlrequest();
-        
     }
 
     public function getIndex()
@@ -20,7 +19,8 @@ class Mpesa extends BaseController
     }
 
 
-    public function getExpress(){
+    public function getExpress()
+    {
         $endpoint = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
         $BusinessShortCode = 174379;
         $passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
@@ -57,7 +57,31 @@ class Mpesa extends BaseController
                 'json' => $body,
                 'http_errors' => false
             )
-            );
+        );
+
+        return $this->response->setJSON($response->getBody());
+    }
+
+
+    public function register_urls()
+    {
+        $endpoint = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl';
+        $data = array(
+            'ValidationURL' => $this->base_url . '/payment/callback',
+            'ConfirmationURL' => $this->base_url . '/payment/pay-validate',
+            'ResponseType' => 'Completed',
+            'ShortCode' => '600999'
+        );
+
+        $response = $this->client->request(
+            'post',
+            $endpoint,
+            array(
+                'headers' => array('authorization' => 'Bearer ' . $this->getAccess_token()),
+                'json' => $data,
+                'http_errors' => false
+            )
+        );
 
         return $this->response->setJSON($response->getBody());
     }
